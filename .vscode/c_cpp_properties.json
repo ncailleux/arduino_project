@@ -1,0 +1,37 @@
+{
+    "env": {
+        "USER.PATH": "C:/Users/nixos",
+        "PROGRAMFILESX86.PATH": "C:/Program Files (x86)"
+    },
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:USER.PATH}/Local/Arduino15/packages/**",
+                "${env:USER.PATH}/Documents/Arduino/libraries/Gamebuino_META/**",
+                "${env:USER.PATH}/Documents/ArduinoData/packages/**",
+                "${env:PROGRAMFILESX86.PATH}/Arduino/libraries/**",
+                "${env:PROGRAMFILESX86.PATH}/Arduino/hardware/**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\nixos\\Documents\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\tools\\**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "USBCON"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "forcedInclude": [
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ]
+        }
+    ],
+    "version": 4
+}
