@@ -1,5 +1,5 @@
 #include "LedControlMS.h"
-#include <Keypad.h>
+#include <IRremote.h>
 #define NBR_MTX 2
 LedControl lc = LedControl(12, 11, 10, NBR_MTX);
 String digits = "1234567890";
@@ -12,10 +12,8 @@ char hexaKeys[ROWS][COLS] = {
     {'4', '5', '6', 'B'},
     {'7', '8', '9', 'C'},
     {'*', '0', '#', 'D'}};
-byte rowPins[ROWS] = {9, 8, 7, 6};
-byte colPins[COLS] = {5, 4, 3, 2};
-Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
+int val = 0;
 int VRx = A0;
 int VRy = A1;
 int SW = A2;
@@ -25,6 +23,11 @@ int yPosition = 0;
 int SW_state = 0;
 int mapX = 0;
 int mapY = 0;
+
+const int RECV_PIN = 7;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+unsigned long key_value = 0;
 
 void setup()
 {
@@ -40,6 +43,9 @@ void setup()
     pinMode(VRx, INPUT);
     pinMode(VRy, INPUT);
     pinMode(SW, INPUT_PULLUP);
+
+    irrecv.enableIRIn();
+    irrecv.blink13(true);
 }
 
 int string_in(const char *string, const char **strings, size_t strings_num)
@@ -53,33 +59,23 @@ int string_in(const char *string, const char **strings, size_t strings_num)
     }
     return -1;
 }
-
-int GetNumber(char key)
-{
-    int num = 0;
-    switch (key)
-    {
-    case NO_KEY:
-        break;
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-        num = num * 10 + (key - '0');
-        break;
-    case '*':
-        num = 0;
-        break;
+/*
+int GetNumber(char key) {
+   int num = 0;
+    switch (key){
+       case NO_KEY:
+          break;
+       case '0': case '1': case '2': case '3': case '4':
+       case '5': case '6': case '7': case '8': case '9':
+          num = num * 10 + (key - '0');
+          break;
+       case '*':
+          num = 0;
+          break;
     }
-    return num;
+   return num;
 }
-
+*/
 /*
  * 0: rien
  * 1: poulpe
@@ -90,14 +86,94 @@ int type = 0;
 int new_type = 0;
 int posXG = 0;
 int posYG = 0;
+//char abs[] = ""
 
 void loop()
 {
-    char customKey = customKeypad.getKey();
-    int v1 = GetNumber(customKey);
-    if (v1)
+    if (irrecv.decode(&results))
     {
-        new_type = v1;
+
+        if (results.value == 0XFFFFFFFF)
+            results.value = key_value;
+
+        switch (results.value)
+        {
+        case 0xFFA25D:
+            Serial.println("Power");
+            break;
+        case 0xFF629D:
+            Serial.println("Vol+");
+            break;
+        case 0xFFE21D:
+            Serial.println("Func");
+            break;
+        case 0xFF22DD:
+            Serial.println("|<<");
+            break;
+        case 0xFF02FD:
+            Serial.println(">||");
+            break;
+        case 0xFFC23D:
+            Serial.println(">>|");
+            break;
+        case 0xFFE01F:
+            Serial.println("-");
+            break;
+        case 0xFFA857:
+            Serial.println("Vol-");
+            break;
+        case 0xFF906F:
+            Serial.println("+");
+            break;
+        case 0xFF9867:
+            Serial.println("EQ");
+            break;
+        case 0xFFB04F:
+            Serial.println("Repeat");
+            break;
+        case 0xFF6897:
+            Serial.println("0");
+            new_type = 0;
+            break;
+        case 0xFF30CF:
+            Serial.println("1");
+            new_type = 1;
+            break;
+        case 0xFF18E7:
+            Serial.println("2");
+            new_type = 2;
+            break;
+        case 0xFF7A85:
+            Serial.println("3");
+            new_type = 3;
+            break;
+        case 0xFF10EF:
+            Serial.println("4");
+            new_type = 4;
+            break;
+        case 0xFF38C7:
+            Serial.println("5");
+            new_type = 5;
+            break;
+        case 0xFF5AA5:
+            Serial.println("6");
+            new_type = 6;
+            break;
+        case 0xFF42BD:
+            Serial.println("7");
+            new_type = 7;
+            break;
+        case 0xFF4AB5:
+            Serial.println("8");
+            new_type = 8;
+            break;
+        case 0xFF52AD:
+            Serial.println("9");
+            new_type = 9;
+            break;
+        }
+        key_value = results.value;
+        irrecv.resume();
     }
     if (type != new_type)
     {
@@ -144,6 +220,8 @@ void loop()
         }
         else if (type == 4)
         {
+            posXG = 0;
+            posYG = 0;
             Serial.println("change to game");
             for (int z = 0; z < 64; z++)
             {
@@ -253,6 +331,10 @@ void loop()
     if (type == 3)
     {
         delay(100);
+    }
+    else if (type == 9)
+    {
+        delay(1000);
     }
     else
     {
