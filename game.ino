@@ -1,5 +1,8 @@
 #include "LedControlMS.h"
 
+#define VIN 5 // V power voltage
+#define R 10000 //ohm resistance value
+
 #define NBR_MTX 2
 LedControl lc = LedControl(12, 11, 10, NBR_MTX);
 
@@ -24,6 +27,10 @@ int button1 = 0;
 int button2 = 0;
 int button3 = 0;
 int button4 = 0;
+
+const int sensorPin = A5;
+int sensorVal;
+float res;
 
 void setup() {
     Serial.begin(9600);
@@ -54,6 +61,14 @@ int string_in(const char *string, const char **strings, size_t strings_num) {
     return -1;
 }
 
+float sensorRawToPhys(int raw){
+  // Conversion rule
+  float Vout = float(raw) * (VIN / float(1023));// Conversion analog to voltage
+  float phys = R *((Vout))/VIN; // Conversion voltage to resistance between GND and signal
+  float phys2 = R *((VIN - Vout))/VIN; // Conversion voltage to resistance between 5V and signal
+  return phys;
+}
+
 int type = 0;
 int new_type = 0;
 int posXG = 0;
@@ -76,7 +91,7 @@ void loop() {
     if (button1 == HIGH) {
         Serial.println("LES BTN 1");
         new_type = new_type + 1;
-        if (new_type > 4) {
+        if (new_type > 5) {
             new_type = 0;
         }
     }
@@ -221,10 +236,235 @@ void loop() {
         Serial.println(SW_state);
         */
     }
-    if (type == 3) {
+    if (type == 5) {
+        sensorVal = analogRead(sensorPin);
+        res = sensorRawToPhys(sensorVal);
+        int maxVal = getConditionValue(res);
+        int val = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                val = 8 * j + i;
+                if (val < maxVal) {
+                    lc.setLed(0, j, i, true);
+                }
+                else {
+                    lc.setLed(0, j, i, false);
+                }
+            }
+        }
+        /*
+        Serial.print(F("Raw value from sensor= "));
+        Serial.println(sensorVal); // the analog reading
+        Serial.print(F("Physical value from sensor = "));
+        Serial.print(res); // the analog reading
+        Serial.println(F(" ohm")); // the analog reading
+        */
+        delay(100);
+    }
+    else if (type == 3) {
         delay(100);
     }
     else {
         delay(200);
     }
+}
+
+int getConditionValue(float res) {
+    int maxVal = 0;
+    if (res < 50) {
+        maxVal = 0;
+    }
+    else if (res < 157) {
+        maxVal = 1;
+    }
+    else if (res < 314) {
+        maxVal = 2;
+    }
+    else if (res < 471) {
+        maxVal = 3;
+    }
+    else if (res < 628) {
+        maxVal = 4;
+    }
+    else if (res < 785) {
+        maxVal = 5;
+    }
+    else if (res < 942) {
+        maxVal = 6;
+    }
+    else if (res < 1099) {
+        maxVal = 7;
+    }
+    else if (res < 1256) {
+        maxVal = 8;
+    }
+    else if (res < 1413) {
+        maxVal = 9;
+    }
+    else if (res < 1570) {
+        maxVal = 10;
+    }
+    else if (res < 1727) {
+        maxVal = 11;
+    }
+    else if (res < 1884) {
+        maxVal = 12;
+    }
+    else if (res < 2041) {
+        maxVal = 13;
+    }
+    else if (res < 2198) {
+        maxVal = 14;
+    }
+    else if (res < 2355) {
+        maxVal = 15;
+    }
+    else if (res < 2512) {
+        maxVal = 16;
+    }
+    else if (res < 2669) {
+        maxVal = 17;
+    }
+    else if (res < 2826) {
+        maxVal = 18;
+    }
+    else if (res < 2983) {
+        maxVal = 19;
+    }
+    else if (res < 3140) {
+        maxVal = 20;
+    }
+    else if (res < 3297) {
+        maxVal = 21;
+    }
+    else if (res < 3454) {
+        maxVal = 22;
+    }
+    else if (res < 3611) {
+        maxVal = 23;
+    }
+    else if (res < 3768) {
+        maxVal = 24;
+    }
+    else if (res < 3925) {
+        maxVal = 25;
+    }
+    else if (res < 4082) {
+        maxVal = 26;
+    }
+    else if (res < 4239) {
+        maxVal = 27;
+    }
+    else if (res < 4396) {
+        maxVal = 28;
+    }
+    else if (res < 4553) {
+        maxVal = 29;
+    }
+    else if (res < 4710) {
+        maxVal = 30;
+    }
+    else if (res < 4867) {
+        maxVal = 31;
+    }
+    else if (res < 5024) {
+        maxVal = 32;
+    }
+    else if (res < 5181) {
+        maxVal = 33;
+    }
+    else if (res < 5338) {
+        maxVal = 34;
+    }
+    else if (res < 5495) {
+        maxVal = 35;
+    }
+    else if (res < 5652) {
+        maxVal = 36;
+    }
+    else if (res < 5809) {
+        maxVal = 37;
+    }
+    else if (res < 5966) {
+        maxVal = 38;
+    }
+    else if (res < 6123) {
+        maxVal = 39;
+    }
+    else if (res < 6280) {
+        maxVal = 40;
+    }
+    else if (res < 6437) {
+        maxVal = 41;
+    }
+    else if (res < 6594) {
+        maxVal = 42;
+    }
+    else if (res < 6751) {
+        maxVal = 43;
+    }
+    else if (res < 6908) {
+        maxVal = 44;
+    }
+    else if (res < 7065) {
+        maxVal = 45;
+    }
+    else if (res < 7222) {
+        maxVal = 46;
+    }
+    else if (res < 7379) {
+        maxVal = 47;
+    }
+    else if (res < 7536) {
+        maxVal = 48;
+    }
+    else if (res < 7693) {
+        maxVal = 49;
+    }
+    else if (res < 7850) {
+        maxVal = 50;
+    }
+    else if (res < 8007) {
+        maxVal = 51;
+    }
+    else if (res < 8164) {
+        maxVal = 52;
+    }
+    else if (res < 8321) {
+        maxVal = 53;
+    }
+    else if (res < 8478) {
+        maxVal = 54;
+    }
+    else if (res < 8635) {
+        maxVal = 55;
+    }
+    else if (res < 8792) {
+        maxVal = 56;
+    }
+    else if (res < 8949) {
+        maxVal = 57;
+    }
+    else if (res < 9106) {
+        maxVal = 58;
+    }
+    else if (res < 9263) {
+        maxVal = 59;
+    }
+    else if (res < 9420) {
+        maxVal = 60;
+    }
+    else if (res < 9577) {
+        maxVal = 61;
+    }
+    else if (res < 9734) {
+        maxVal = 62;
+    }
+    else if (res < 9891) {
+        maxVal = 63;
+    }
+    else {
+        maxVal = 64;
+    }
+    return maxVal;
 }
